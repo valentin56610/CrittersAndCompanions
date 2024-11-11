@@ -1,13 +1,11 @@
 package com.github.eterdelta.crittersandcompanions;
 
-import com.github.eterdelta.crittersandcompanions.client.renderer.SilkLeashRenderer;
 import com.github.eterdelta.crittersandcompanions.handler.PlayerHandler;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.packs.PackType;
 import net.minecraft.server.packs.repository.Pack;
 import net.minecraft.server.packs.repository.PackSource;
 import net.minecraft.world.item.context.UseOnContext;
-import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.AddPackFindersEvent;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.event.entity.EntityAttributeCreationEvent;
@@ -19,7 +17,6 @@ import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
-import net.minecraftforge.fml.loading.FMLEnvironment;
 import net.minecraftforge.forgespi.locating.IModFile;
 import net.minecraftforge.resource.PathPackResources;
 
@@ -33,11 +30,7 @@ public class CrittersAndCompanionsForge {
         CrittersAndCompanions.init();
 
         FMLJavaModLoadingContext.get().getModEventBus().addListener((FMLCommonSetupEvent event) -> event.enqueueWork(CrittersAndCompanions::setup));
-        FMLJavaModLoadingContext.get().getModEventBus().addListener((FMLClientSetupEvent event) -> event.enqueueWork(CrittersAndCompanions::clientSetup));
-
-        if (FMLEnvironment.dist.isClient()) {
-            MinecraftForge.EVENT_BUS.addListener(SilkLeashRenderer::renderSilkLeash);
-        }
+        FMLJavaModLoadingContext.get().getModEventBus().addListener((FMLClientSetupEvent event) -> event.enqueueWork(CrittersAndCompanionsClient::clientSetup));
     }
 
     @SubscribeEvent

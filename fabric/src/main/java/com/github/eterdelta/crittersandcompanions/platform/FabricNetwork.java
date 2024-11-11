@@ -3,9 +3,12 @@ package com.github.eterdelta.crittersandcompanions.platform;
 import com.github.eterdelta.crittersandcompanions.CrittersAndCompanions;
 import com.github.eterdelta.crittersandcompanions.network.IPacketHandler;
 import com.github.eterdelta.crittersandcompanions.platform.service.INetwork;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
+import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerChunkCache;
@@ -16,14 +19,20 @@ import java.util.Locale;
 
 public class FabricNetwork implements INetwork {
 
-    @Override
-    public <T> Sender<T> createSender(Class<T> clazz, IPacketHandler<T> handler) {
-        var id = new ResourceLocation(CrittersAndCompanions.MODID, clazz.getSimpleName().toLowerCase(Locale.ROOT));
-
+    private <T> void registerReceiver(ResourceLocation id, IPacketHandler<T> handler) {
         ClientPlayNetworking.registerGlobalReceiver(id, (client, handler1, buf, responseSender) -> {
             var packet = handler.read(buf);
             client.execute(() -> handler.handle(packet));
         });
+    }
+
+    @Override
+    public <T> Sender<T> createSender(Class<T> clazz, IPacketHandler<T> handler) {
+        var id = new ResourceLocation(CrittersAndCompanions.MODID, clazz.getSimpleName().toLowerCase(Locale.ROOT));
+
+        if (FabricLoader.getInstance().getEnvironmentType() == EnvType.CLIENT) {
+            registerReceiver(id, handler);
+        }
 
         return new Sender<>() {
             private FriendlyByteBuf write(T packet) {
@@ -39,7 +48,7 @@ public class FabricNetwork implements INetwork {
 
             @Override
             public void sendToTracking(Entity entity, T packet) {
-                if(entity.getCommandSenderWorld().getChunkSource() instanceof ServerChunkCache chunk) {
+                if (entity.getCommandSenderWorld().getChunkSource() instanceof ServerChunkCache chunk) {
                     chunk.broadcastAndSend(entity, ServerPlayNetworking.createS2CPacket(id, write(packet)));
                 }
             }
