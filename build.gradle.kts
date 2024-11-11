@@ -4,6 +4,8 @@ plugins {
 
 subprojects {
     repositories {
+        modrinthMaven()
+
         maven {
             url = uri("https://dl.cloudsmith.io/public/geckolib3/geckolib/maven/")
             content {

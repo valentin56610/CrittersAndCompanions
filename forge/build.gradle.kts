@@ -9,4 +9,6 @@ forge {
 
 dependencies {
     modImplementation("software.bernie.geckolib:geckolib-forge-${mc_version}:${geckolib_version}")
+
+    modRuntimeOnly("maven.modrinth:easy-villagers:YG1zrman")
 }

@@ -55,8 +55,6 @@ public class PlayerHandler {
                 && !(handStack.is(CACItems.SILK_LEAD.get()) || handStack.is(Items.LEAD))
                 && context.getHand() == InteractionHand.MAIN_HAND) {
 
-            if(isClient) return InteractionResult.SUCCESS;
-
             int unleashedStates = 0;
             unleashedStates += Math.max(0, SilkLeashItem.updateLeashStates(entity, null) - 1);
             unleashedStates += Math.max(0, SilkLeashItem.updateLeashStates(null, entity) - 1);
@@ -69,7 +67,7 @@ public class PlayerHandler {
                     entityLeashState.sendLeashState();
                 }
 
-                return InteractionResult.CONSUME;
+                return InteractionResult.sidedSuccess(isClient);
             }
         } else {
             LivingEntity uniqueLeash = Iterables.getFirst(playerLeashingEntities, null);
